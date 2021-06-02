@@ -43,8 +43,8 @@ The following screen captures give some examples of functionality available to t
   * [CEOS OpenSearch Best Practice v1.3](https://ceos.org/document_management/Working_Groups/WGISS/Documents/WGISS%20Best%20Practices/CEOS%20OpenSearch%20Best%20Practice.pdf) 
   
 * Presentations
-  * [ESE-ERGO Final Presentation, 28/05/2021](./documentation/20210528-ESE-ERGO-FP-Achievements-2-metadataeditor.pdf)  
-  * [CEOS WGISS-50, fedEO Metadata Editor, 22/09/2020](http://ceos.org/document_management/Working_Groups/WGISS/Meetings/WGISS-50/1.%20Tuesday%20Sept%2022/2020.09.22_fedeo_metadata_editor.pptx)
+  * [ESE-ERGO Final Presentation, 28/05/2021](./documentation/20210528-ESE-ERGO-FP-Achievements-3-metrics.pdf)  
+  * [CEOS WGISS-49, FedEO Report, 21/04/2020](http://ceos.org/document_management/Working_Groups/WGISS/Meetings/WGISS-49/1.%20Tuesday%20April%2021/20200421T1325_FedEO_Report.pptx)
 
 ## Credits
 
