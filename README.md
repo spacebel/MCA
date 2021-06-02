@@ -22,13 +22,15 @@ Finally, it published daily summaries of metrics as CSV files on an FTP server f
 
 The following screen captures give some examples of functionality available to the users through the Web-based user interface.  
 
+**Global metrics**
+
 ![Global metrics](/images/global-metrics.png)
 
-TBD.
+**Data Provider metrics**
 
 ![Provider metrics](/images/provider-metrics.png)
 
-TBD.
+**Collection metrics**
 
 ![Collection metrics](/images/collection-metrics.png)
 
