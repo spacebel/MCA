@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Metrics Client application provides a Web-based user interface allowing to browse catalogue access metrics.  The metrics visualised comprise the following groups defined by the CEOS WGISS System Level Team:
+The Metrics Client application provides a Web-based user interface allowing to browse OpenSearch catalogue access metrics.  The metrics visualised comprise the following groups defined by the CEOS WGISS System Level Team:
 
 *	Global Core Metrics
 *	Data Provider Core Metrics
