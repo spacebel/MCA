@@ -1,0 +1,47 @@
+<organisations>
+    <organisation name="ESA">
+        <query>parentIdentifier=EOP:ESA:EARTH-ONLINE</query>
+    </organisation>
+    <organisation name="SCIHUB">
+        <query>subject=SCIHUB</query>
+    </organisation>
+    <organisation name="DLR">
+        <query>parentIdentifier=EOP:DLR:GEOSERVICE</query>
+    </organisation>
+    <organisation name="EUMETSAT">
+        <query>parentIdentifier=EOP:EUMETSAT</query>
+    </organisation>
+    <organisation name="JAXA">
+        <query>parentIdentifier=EOP:JAXA:CATS-I</query>
+    </organisation>			
+    <organisation name="VITO">
+        <query>parentIdentifier=EOP:VITO:PDF</query>
+    </organisation>
+    <organisation name="VITO-TERRASCOPE">
+        <query>parentIdentifier=EOP:VITO:TERRASCOPE</query>
+    </organisation>		
+    <organisation name="CCI">
+        <query>parentIdentifier=EOP:STFC:CEDA-CCI</query>
+    </organisation>
+    <organisation name="CloudFerro">
+        <query>organisationName=CloudFerro</query>
+    </organisation>
+    <organisation name="CMEMS">
+        <query>parentIdentifier=EOP:EU:CMEMS</query>
+    </organisation>
+    <organisation name="ECV">
+        <query>parentIdentifier=EOP:ESA:ECV</query>
+    </organisation>
+    <organisation name="Sinergise">
+        <query>organisationName=Sinergise</query>
+    </organisation>
+    <organisation name="CNES">
+        <query>organisationName=CNES&amp;subject=FedEO</query>
+    </organisation>
+    <organisation name="ROSCOSMOS">
+        <query>organisationName=ROSCOSMOS</query>
+    </organisation>
+    <organisation name="CNES-REFLECS">
+        <query>parentIdentifier=EOP:CNES:REFLECS</query>
+    </organisation>
+</organisations>

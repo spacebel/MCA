@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-client-deployment
+  labels:
+    app: metrics-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-client
+  template:
+    metadata:
+      labels:
+        app: metrics-client
+    spec:
+       imagePullSecrets:
+       - name: dockerhubcred
+       containers:
+       - name: metrics
+         image: spacedockerspb/metrics-client:latest
+         imagePullPolicy: Always
+         ports:
+         - containerPort: 9000         
+         volumeMounts:
+         - mountPath: /nfs
+           name: shared-nfs
+         env:         
+         - name : PROVIDERS_FILE
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: providers.file
+         - name : OPENSEARCH_COLLECTION_CATALOGUE_URL
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: opensearch.catalogue.url
+         - name : MIMETYPE_PARAMETER
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: mimetype.parameter
+         - name : MATCHING_COLLECTION_ID_REGEX
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: matching.collection.id.regex
+         - name : DATE_RANGE
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: date.range
+         - name : TOP_COLLECTIONS
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: top.collections
+         - name : ELASTICSEARCH_URL
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: elasticsearch.database.url
+         - name : ELASTICSEARCH_SEARCH_REQUEST_INDEX
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: elasticsearch.search.request.index
+         - name : ELASTICSEARCH_OSDD_REQUEST_INDEX
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: elasticsearch.osdd.request.index         
+         - name : CRON_EXPRESSION
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: cron.expression
+         - name : DEFAULT_COUNTRY_CODE
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: default.country.code
+         - name : DEFAULT_COUNTRY_NAME
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: default.country.name
+         - name : FTP.SERVER
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: ftp.server
+         - name : FTP_SERVER_PORT
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: ftp.server.port
+         - name : FTP_USERNAME
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: ftp.username
+         - name : FTP_PASSWORD
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: ftp.password
+         - name : FTP_REPORT_DIRECTORY
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: ftp.report.directory
+         - name : MAIN_MENU_ITEMS
+           valueFrom:
+             configMapKeyRef:
+                 name: metrics-client-cm
+                 key: main.menu.items
+       volumes:
+       - name: shared-nfs
+         hostPath:
+           path: /nfsdata
+           type: Directory

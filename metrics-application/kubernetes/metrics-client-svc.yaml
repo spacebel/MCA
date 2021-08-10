@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-client-svc
+  labels:
+    app: metrics-client-svc
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080 # Spring boot port
+    nodePort: 30302 # this port is used for NGINX configuration
+  selector:
+    app: metrics-client  
+  type: NodePort
+  

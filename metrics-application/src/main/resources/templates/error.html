@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title th:text="${appTitle}">FedEO Metrics</title>
+        <link rel="stylesheet" href="/metrics-resources/jquery/themes/base/jquery-ui.css">		
+        <script src="/metrics-resources/jquery/jquery-1.12.4.min.js"></script>
+        <script src="/metrics-resources/jquery/jquery-ui-1.12.1.min.js"></script>				
+        <link rel="stylesheet" href="/metrics-resources/bootstrap/bootstrap-table.min.css">
+        <script src="/metrics-resources/bootstrap/bootstrap-table.min.js"></script>
+        <script src="/metrics-resources/plotly/plotly.min.js"></script>
+        <link rel="stylesheet" href="/metrics-resources/css/metrics.main.css">
+        <style>
+
+        </style>
+    </head>
+    <body> 
+        <table class="main" width="1080" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top" width="100%">
+                    <div class="spb-header-window"> 
+                        <table border="0" align="center" cellpadding="0" cellspacing="0">
+                            <tr class="header">
+                                <td class="banner-left"></td>
+                                <td></td>
+                                <td class="banner-right"></td>
+                            </tr>
+                            <tr>
+                                <td valign="top" width="100%">
+                                    <div class="title-header">
+                                        <a href="/" class="spb-breadcrumbs-link" hidefocus="on" unselectable="on" tabindex="0">												
+                                            <span class="spb-breadcrumbs-text">Home Page</span>
+                                        </a>									
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="error-container">
+                        <h1 class="error-title">Error Occurred!</h1>
+                        <div class="error-message" role="alert">
+                            <b>
+                                [<span th:text="${status}">status</span>]
+                                <span th:text="${error}">error</span>
+                            </b>
+                            <p th:text="${message}">message</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+
+</html>

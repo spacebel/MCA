@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title th:text="${appTitle}">FedEO Metrics</title>
+        <link rel="stylesheet" href="/metrics-resources/jquery/themes/base/jquery-ui.css">		
+        <script src="/metrics-resources/jquery/jquery-1.12.4.min.js"></script>
+        <script src="/metrics-resources/jquery/jquery-ui-1.12.1.min.js"></script>				
+        <link rel="stylesheet" href="/metrics-resources/bootstrap/bootstrap-table.min.css">
+        <script src="/metrics-resources/bootstrap/bootstrap-table.min.js"></script>
+        <script src="/metrics-resources/plotly/plotly.min.js"></script>
+        <link rel="stylesheet" href="/metrics-resources/css/metrics.main.css">
+        <link rel="stylesheet" href="/metrics-resources/banner/metrics.header.css">
+
+        <style>
+
+        </style>
+    </head>
+    <body> 
+        <table class="main" width="1080" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top" width="100%">
+                    <div class="spb-header-window"> 
+                        <table border="0" align="center" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td width="100%">                                    
+                                    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+                                        <tr class="main-menu-section">
+                                            <td width="100%">					
+                                                <div class="container">
+                                                    <nav class="main-menu">
+                                                        <ul th:each="menuItem : ${menuItems}">                                                            
+                                                            <li>
+                                                                <a th:href="@{${menuItem.url}}" th:text="${menuItem.text}"/>                                                                
+                                                            </li>                                                            
+                                                        </ul>    
+                                                    </nav>			
+                                                </div>	
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="100%">
+                                                <table class="banner">
+                                                    <tr>
+                                                        <td class="left">
+                                                            <a href="http://ceos.org" target="_blank"></a>
+                                                        </td>
+                                                        <td class="right">
+                                                            <b>fedeo</b>
+                                                            <br/>
+                                                            Federated EO missions support environment
+                                                        </td>
+                                                    </tr>
+                                                </table>				
+                                            </td>				
+                                        </tr>                                       
+                                    </table>
+                                </td>                                
+                            </tr>                           
+                            <tr>
+                                <td valign="top" width="100%">
+                                    <div class="title-header">
+                                        <span th:if="${formQuery.context == 'H'}" 
+                                              th:text="${appTitle}" 
+                                              class="spb-breadcrumbs-text">
+                                        </span>
+                                        <a th:if="${formQuery.context == 'P' or formQuery.context == 'C'}" 
+                                           th:href="@{/(startdate=${formQuery.startDate},enddate=${formQuery.endDate})}"
+                                           class="spb-breadcrumbs-link"
+                                           hidefocus="on" unselectable="on" tabindex="0">												
+                                            <span th:text="${appTitle}" class="spb-breadcrumbs-text"></span>
+                                        </a>
+
+                                        <span th:if="${(not #strings.isEmpty(formQuery.provider)) and (formQuery.context == 'P' or formQuery.context == 'C')}"
+                                              class="spb-breadcrumbs-text">
+                                            &#160;>&#160;
+                                        </span>
+                                        <span th:if="${(not #strings.isEmpty(formQuery.provider)) and formQuery.context == 'P'}"
+                                              th:text="${formQuery.provider}" 
+                                              class="spb-breadcrumbs-text">
+                                        </span>
+                                        <a th:if="${(not #strings.isEmpty(formQuery.provider)) and formQuery.context == 'C'}" 
+                                           th:href="@{/provider/{name}(name=${formQuery.provider},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}"
+                                           class="spb-breadcrumbs-link"
+                                           hidefocus="on" unselectable="on" tabindex="0">
+                                            <span th:text="${formQuery.provider}" class="spb-breadcrumbs-text"></span>
+                                        </a>
+                                        <span th:if="${formQuery.context == 'C'}"
+                                              class="spb-breadcrumbs-text">
+                                            &#160;>&#160;
+                                        </span>
+                                        <span th:if="${formQuery.context == 'C'}"
+                                              th:text="${formQuery.shorterCollection}"
+                                              th:title="${formQuery.collection}"
+                                              class="spb-breadcrumbs-text">											
+                                        </span>
+                                        <!--
+                                        <a th:if="${formQuery.context == 'C'}" 
+                                                th:href="@{/collection/{id}(id=${formQuery.collection},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}"
+                                                th:title="${formQuery.collection}"
+                                                class="spb-breadcrumbs-link"
+                                                hidefocus="on" unselectable="on" tabindex="0">
+                                                <span th:text="${formQuery.shorterCollection}" class="spb-breadcrumbs-text"></span>
+                                        </a>
+                                        -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>			
+            <tr>
+                <td valign="top" width="100%">                    
+                    <div>
+                        <div class="spb-shadow"></div>
+                        <div class="spb-main-window x-border-box" tabindex="-1">
+                            <div class="spb-toolbar x-docked x-docked-top x-box-layout-ct">
+                                <div class="x-box-inner " style="height: 27px;">
+                                    <div class="x-box-target" >
+                                        <div class="date-range" >
+                                            <form th:if="${formQuery.context == 'H'}" 
+                                                  th:action="@{/}" action="#" 
+                                                  th:object="${formQuery}" method="post">
+                                                From: <input type="text" id="fromDatepicker" th:field="*{startDate}" class="x-form-field x-form-text"/>
+                                                To: <input type="text" id="toDatepicker" th:field="*{endDate}" class="x-form-field x-form-text"/>
+                                                <input type="hidden" th:field="*{context}"/>
+                                                <input type="hidden" th:field="*{provider}"/>
+                                                <input type="hidden" th:field="*{collection}"/>
+                                                <input type="submit" value="Apply" class="spb-submit"/>  
+                                                <span th:text="${keepAtt}"/>
+                                            </form>
+
+                                            <form th:if="${formQuery.context == 'P'}" 
+                                                  th:action="@{/provider/{name}(name=${formQuery.provider},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" action="#" 
+                                                  th:object="${formQuery}" method="post">
+
+                                                From: <input type="text" id="fromDatepicker" th:field="*{startDate}" class="x-form-field x-form-text"/>
+                                                To: <input type="text" id="toDatepicker" th:field="*{endDate}" class="x-form-field x-form-text"/>
+                                                <input type="hidden" th:field="*{context}"/>
+                                                <input type="hidden" th:field="*{provider}"/>
+                                                <input type="hidden" th:field="*{collection}"/>
+                                                <input type="submit" value="Apply" class="spb-submit"/>  
+                                                <span th:text="${keepAtt}"/>
+                                            </form>
+
+                                            <form th:if="${formQuery.context == 'C'}" 
+                                                  th:action="@{/collection/{id}(id=${formQuery.collection},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" action="#" 
+                                                  th:object="${formQuery}" method="post">
+
+                                                From: <input type="text" id="fromDatepicker" th:field="*{startDate}" class="x-form-field x-form-text"/>
+                                                To: <input type="text" id="toDatepicker" th:field="*{endDate}" class="x-form-field x-form-text"/>
+                                                <input type="hidden" th:field="*{context}"/>
+                                                <input type="hidden" th:field="*{provider}"/>
+                                                <input type="hidden" th:field="*{collection}"/>
+                                                <input type="submit" value="Apply" class="spb-submit"/>  
+                                                <span th:text="${keepAtt}"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="spb-window-interface x-window-body x-window-body-default x-box-layout-ct x-window-body-default">
+                                <div class="x-box-inner">
+                                    <fieldset class="x-fieldset x-fieldset-with-title x-fieldset-with-legend x-box-item x-window-item x-fieldset-default">
+                                        <legend class="x-fieldset-header x-fieldset-header-default">
+                                            <span style="display:table;">
+                                                <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                    <div class="x-fieldset-header-text">Interface</div>
+                                                </div>
+                                            </span>
+                                        </legend>
+                                        <div class="x-fieldset-body x-column-layout-ct">
+                                            <span style="display: table; width: 100%; table-layout: fixed;">
+                                                <div style="display:table-cell;height:100%;vertical-align:top;" >
+                                                    <table class="interfaces" >
+                                                        <tr>
+                                                            <td class="header" width="10%">&#160;</td>
+                                                            <td class="header" width="15%">Queries</td>
+                                                            <td class="header" width="15%">Success</td>
+                                                            <td class="header" width="15%">Failure</td>
+                                                            <td class="header" width="15%">Average Time</td>
+                                                            <td class="header" width="15%">Minimum Time</td>
+                                                            <td class="header" width="15%">Maximum Time</td>
+                                                        </tr>
+
+                                                        <tr th:if="${osddReqSum != null}">
+                                                            <td width="10%" class="contents">OSDD Requests</td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.totalVisits}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.successVisits}" 
+                                                                       readonly="readonly" class="success-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.failureVisits}" 
+                                                                       readonly="readonly" class="failure-text x-form-field x-form-text"/>
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.averageTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.minTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${osddReqSum.maxTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr th:if="${searchReqSum != null}">
+                                                            <td width="10%" class="contents">Search Requests</td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.totalVisits}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.successVisits}" 
+                                                                       readonly="readonly" class="success-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.failureVisits}" 
+                                                                       readonly="readonly" class="failure-text x-form-field x-form-text"/>
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.averageTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.minTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                            <td width="15%" class="contents">
+                                                                <input type="text" size="1" th:value="${searchReqSum.maxTimeStr}" 
+                                                                       readonly="readonly" class="normal-text x-form-field x-form-text" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </fieldset>                                    	
+                                </div>
+                            </div>
+
+                            <div class="spb-contents-panel x-plain x-box-item x-window-item x-plain-default">
+                                <div class="x-plain-body x-plain-body-default x-column-layout-ct x-plain-body-default">
+                                    <span style="display: table; width: 100%; table-layout: fixed;">
+
+                                        <div th:if="${formQuery.context == 'H'}" style="display:table-cell;height:100%;vertical-align:top;">
+                                            <span th:text="${keepAtt}"/>
+                                            <div class="spb-home-provider-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding: 3px; left: 0px; top: 0px;">
+                                                    <span style="display: table; width: 100%; height:100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-provider-collection-fieldset spb-x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Data Providers</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-home-provider-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"                                                                           
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20" 
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-home-provider">Provider</th>
+                                                                                <th data-sortable="true" class="header-home-provider-queries">Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="provider: ${providers}">
+                                                                                <td th:if="${not #strings.equals(provider.name,'SPB_UNKNOWN')}" 
+                                                                                    class="data-row data-link-row">
+                                                                                    <a th:href="@{/provider/{name}(name=${provider.name},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" 
+                                                                                       th:text="${provider.name}" 
+                                                                                       class="deco-link">
+                                                                                    </a>
+                                                                                </td>
+                                                                                <td th:if="${#strings.equals(provider.name,'SPB_UNKNOWN')}" 
+                                                                                    th:text="Unknown"
+                                                                                    class="data-row">
+                                                                                </td>																				
+                                                                                <td th:text="${provider.visits}" class="data-row"></td>																			
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="spb-home-collection-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-provider-collection-fieldset spb-x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Collections (Top 20)</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-home-collection-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"
+                                                                           data-height="612">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-home-collection">Collection</th>
+                                                                                <th data-sortable="true" class="header-home-collection-provider">Provider</th>
+                                                                                <th data-sortable="true" class="header-home-collection-queries">Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="coll: ${collections}">
+                                                                                <td th:if="${not #strings.equals(coll.id,'SPB_NON_COLLECTION')}"
+                                                                                    class="data-row data-link-row">
+                                                                                    <a th:href="@{/collection/{id}(id=${coll.id},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" 
+                                                                                       th:text="${coll.id}" 
+                                                                                       class="deco-link">
+                                                                                    </a>
+                                                                                    <!--
+                                                                                    <a th:href="@{/collection(id=${coll.id},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" 
+                                                                                            th:text="${coll.id}" 
+                                                                                            class="deco-link">
+                                                                                    </a>
+                                                                                    -->
+                                                                                </td>
+                                                                                <td th:if="${#strings.equals(coll.id,'SPB_NON_COLLECTION')}"																					
+                                                                                    class="data-row">
+                                                                                    No collection
+                                                                                </td>
+                                                                                <td th:if="${not #strings.equals(coll.provider,'SPB_UNKNOWN')}"
+                                                                                    th:text="${coll.provider}" 
+                                                                                    class="data-row">
+                                                                                </td>																						
+                                                                                <td th:if="${#strings.equals(coll.provider,'SPB_UNKNOWN')}"
+                                                                                    th:text="Unknown" 
+                                                                                    class="data-row">
+                                                                                </td>
+                                                                                <td th:text="${coll.visits}" class="data-row"></td>																			
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="spb-home-country-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-home-country-fieldset spb-x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Countries</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-home-country-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20" 
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-home-country">Country</th>																				
+                                                                                <th data-sortable="true" class="header-home-country-osdd">OSDD Queries</th>
+                                                                                <th data-sortable="true" class="header-home-country-search">Search Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="oneCountry: ${countries}">
+                                                                                <td th:text="${oneCountry.name}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.osddVisits}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.searchVisits}" class="data-row"></td>
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div th:if="${formQuery.context == 'P'}" 
+                                             style="display:table-cell;height:100%;vertical-align:top;">
+                                            <span th:text="${keepAtt}"/>
+                                            <div class="spb-provider-collection-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-provider-collection-fieldset spb-x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Collections</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-provider-collection-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20" 
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-provider-collection">Collection</th>
+                                                                                <th data-sortable="true" class="header-provider-collection-provider">Provider</th>
+                                                                                <th data-sortable="true" class="header-provider-collection-queries">Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="coll: ${collections}">
+                                                                                <td class="data-row data-link-row">
+                                                                                    <a th:href="@{/collection/{id}(id=${coll.id},startdate=${formQuery.startDate},enddate=${formQuery.endDate})}" 
+                                                                                       th:text="${coll.id}" 
+                                                                                       class="deco-link">
+                                                                                    </a>
+                                                                                </td>
+                                                                                <td th:if="${not #strings.equals(coll.provider,'SPB_UNKNOWN')}"
+                                                                                    th:text="${coll.provider}" 
+                                                                                    class="data-row">
+                                                                                </td>																						
+                                                                                <td th:if="${#strings.equals(coll.provider,'SPB_UNKNOWN')}"
+                                                                                    th:text="Unknown" 
+                                                                                    class="data-row">
+                                                                                </td>
+                                                                                <td th:text="${coll.visits}" class="data-row"></td>																			
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="spb-provider-country-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-provider-country-fieldset spb-x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Countries</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-provider-country-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20" 
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-provider-country">Country</th>																				
+                                                                                <th data-sortable="true" class="header-provider-country-osdd">OSDD Queries</th>
+                                                                                <th data-sortable="true" class="header-provider-country-search">Search Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="oneCountry: ${countries}">
+                                                                                <td th:text="${oneCountry.name}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.osddVisits}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.searchVisits}" class="data-row"></td>
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>                                                                                        
+                                        </div>
+
+                                        <div th:if="${formQuery.context == 'C'}" 
+                                             style="display:table-cell;height:100%;vertical-align:top; top: 570px;">
+                                            <span th:text="${keepAtt}"/>
+                                            <div class="spb-country-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-country-fieldset x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Countries</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-country-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"                                                                           
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20"                                                                           
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-country">Country</th>																				
+                                                                                <th data-sortable="true" class="header-country-osdd">OSDD Queries</th>
+                                                                                <th data-sortable="true" class="header-country-search">Search Queries</th>
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="oneCountry: ${countries}">
+                                                                                <td th:text="${oneCountry.name}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.osddVisits}" class="data-row"></td>
+                                                                                <td th:text="${oneCountry.searchVisits}" class="data-row"></td>
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="spb-clientids-panel x-plain x-column x-plain-default">
+                                                <div class="x-plain-body x-plain-body-default x-plain-body-default" style="padding-top: 3px; left: 0px; top: 0px;">
+                                                    <span  style="display: table; width: 100%; table-layout: fixed;">
+                                                        <div style="display:table-cell;height:100%;vertical-align:top;">
+                                                            <fieldset class="spb-clientids-fieldset x-fieldset x-fieldset-with-title x-fieldset-with-legend x-fieldset-default">
+                                                                <legend class="x-fieldset-header x-fieldset-header-default">
+                                                                    <span style="display:table;">
+                                                                        <div style="height: 100%; vertical-align: top; display: table-cell;">
+                                                                            <div class="x-fieldset-header-text">Client IDs</div>
+                                                                        </div>
+                                                                    </span>
+                                                                </legend>
+                                                                <div class="spb-clientids-data-table fieldset-body-table">
+                                                                    <table class="data-table"
+                                                                           data-toggle="table"
+                                                                           data-sort-class="table-active"
+                                                                           data-sortable="true"                                                                           
+                                                                           data-pagination="true" 
+                                                                           data-page-size="20"                                                                           
+                                                                           data-pagination-successively-size="3">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th data-sortable="true" class="header-clientid">Client ID</th>                                                                                
+                                                                                <th data-sortable="true" class="header-clientid-queries">OSDD Queries</th>                                                                                 
+                                                                            </tr>																			
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr th:each="oneClientId: ${clientIds}">                                                                                
+                                                                                <td th:text="${oneClientId.name}" class="data-row"></td>
+                                                                                <td th:text="${oneClientId.osddVisits}" class="data-row"></td>																			
+                                                                            </tr>
+                                                                        </tbody>	
+                                                                    </table>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div id="spbCharts" 
+                                                 th:if="${formQuery.context == 'C'}"                                                 class="x-surface x-box-item x-window-item x-surface-default" 
+
+                                                 style="height: 450px; right: auto; left: 5px; margin: 0px; width: 1068px; top: 210px;">										
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>							
+                        </div>												
+                    </div>
+                </td>
+            </tr>
+        </table>						
+
+        <script>
+            document.onreadystatechange = () => {
+                if (document.readyState === 'complete') {
+                    $("#fromDatepicker").datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        dateFormat: "yy/mm/dd"
+                    });
+                    $("#toDatepicker").datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        dateFormat: "yy/mm/dd"
+                    });
+                }
+            };
+        </script>	
+
+        <script th:inline="javascript">
+            var osddRequestDates = /*[[${osddRequestDates}]]*/ [];
+            var osddRequestVisits = /*[[${osddRequestVisits}]]*/ [];
+            var searchRequestDates = /*[[${searchRequestDates}]]*/ [];
+            var searchRequestVisits = /*[[${searchRequestVisits}]]*/ [];
+
+            var data = [];
+            if (typeof osddRequestDates !== 'undefined'
+                    && osddRequestDates.length > 0
+                    && typeof osddRequestVisits !== 'undefined'
+                    && osddRequestVisits.length > 0) {
+
+                var osddData = {
+                    type: "scatter",
+                    x: osddRequestDates,
+                    y: osddRequestVisits,
+                    name: 'OSDD Requests',
+                    mode: 'lines+markers'
+                };
+                data.push(osddData);
+            }
+
+            if (typeof searchRequestDates !== 'undefined'
+                    && searchRequestDates.length > 0
+                    && typeof searchRequestVisits !== 'undefined'
+                    && searchRequestVisits.length > 0) {
+
+                var searchData = {
+                    type: 'scatter',
+                    x: searchRequestDates,
+                    y: searchRequestVisits,
+                    name: 'Search Requests',
+                    mode: 'lines+markers',
+                    'hoverinfo': 'all'
+                };
+                data.push(searchData);
+            }
+
+            if (data.length > 0) {
+                var layout = {
+                    xaxis: {
+                        title: 'Date',
+                        type: 'date',
+                        tickformat: '%Y/%m/%d'
+                    },
+                    yaxis: {
+                        title: 'Number of Visits'
+                    }
+                };
+
+                //Plotly.newPlot('spbCharts', data, layout, {displayModeBar: false});
+            }
+
+        </script>	
+    </body>
+</html>

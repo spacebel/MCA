@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-client-cm
+data:  
+  providers.file: $shared_nfs_dir/metrics/providers.xml
+  opensearch.catalogue.url: $kubernetes_master_url/collections/series/items
+  mimetype.parameter: httpAccept=application/atom%2Bxml
+  matching.collection.id.regex: /series/items/(.*?)/api
+  date.range: "20"
+  top.collections: "20"
+  elasticsearch.database.url: http://elasticsearch-logging.kube-system:9200
+  elasticsearch.search.request.index: opensearch-request
+  elasticsearch.osdd.request.index: opensearch-osdd  
+  cron.expression: 0 0 0 * * *
+  default.country.code: country_code
+  default.country.name: country_name  
+  ftp.server: ftp_server
+  ftp.server.port: "ftp_port"
+  ftp.username: ftp_user
+  ftp.password: ftp_user_password
+  ftp.report.directory: metrics/reports  
+  main.menu.items: Home{$kubernetes_master_url/readme.html},Assets{$kubernetes_master_url /assets},Metrics{$kubernetes_master_url/metrics},Client{$fedeo_client_url},Editor{$editor_url}  
