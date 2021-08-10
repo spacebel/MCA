@@ -1,0 +1,16 @@
+The Metrics Client Application (MCA) published in this repository is licensed under the terms of the Apache License 2.0.
+
+However, this application includes several third-party Open-Source libraries, which are licensed under their own respective Open-Source licenses.
+
+Lists of  third-party dependencies.
+     (Apache License 2.0) Spring Boot Starter Web (v2.3.1.RELEASE) 
+     (Apache License 2.0) Spring Boot Starter Thymeleaf (v2.3.1.RELEASE) 
+	 (Apache License 2.0) Spring Boot Starter Security (v2.3.1.RELEASE)
+	 (Apache License 2.0) Elasticsearch (v6.7.1)
+	 (Apache License 2.0) Elasticsearch REST High Level Client (v6.7.1) 
+	 (Apache License 2.0) Apache HttpComponents Client (v4.5.12)
+	 (Apache License 2.0) Apache Commons Lang (v3.7) 
+	 (Apache License 2.0) Apache Commons Net library (v3.6)
+	 (Apache License 2.0) Xerces2 (v2.11.0)
+	 (Apache License 2.0) Xalan Java (v2.7.1) 
+ 
